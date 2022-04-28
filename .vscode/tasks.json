@@ -1,0 +1,71 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "options": {
+        "env": {
+            // "engine" : "docker exec --user mersdk -w ${workspaceFolder} aurora-os-build-engine",
+            // "target" : "AuroraOS-4.0.1.20-base-armv7hl",
+            "engine" : "sfdk engine exec",
+            "target" : "SailfishOS-4.4.0.58-armv7hl",
+            "datapath" : "/home/defaultuser/Downloads/glmark2/data"
+        }
+    },
+    "tasks": [
+        {
+            "label": "Configure Aurora/Sailfish armv7",
+            "type": "shell",
+            "command": "${engine}",
+            "args": [
+                "sb2",
+                "-t",
+                "${target}",
+                "./waf",
+                "configure",
+                "--with-flavors=wayland-glesv2",
+                "--data-path=${datapath}",
+                "--prefix=/usr"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build Aurora/Sailfish armv7",
+            "type": "shell",
+            "command": "${engine}",
+            "args": [
+                "sb2",
+                "-t",
+                "${target}",
+                "./waf",
+                "build",
+                "-j12"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Clean Aurora/Sailfish armv7",
+            "type": "shell",
+            "command": "${engine}",
+            "args": [
+                "sb2",
+                "-t",
+                "${target}",
+                "./waf",
+                "clean"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
