@@ -49,6 +49,7 @@ private:
     static void quit_handler(int signum);
 
     static const struct wl_registry_listener registry_listener_;
+    static const struct wl_shell_surface_listener shell_surface_listener_;
     static const struct xdg_wm_base_listener xdg_wm_base_listener_;
     static const struct xdg_surface_listener xdg_surface_listener_;
     static const struct xdg_toplevel_listener xdg_toplevel_listener_;
@@ -81,6 +82,15 @@ private:
 
     static void
     output_handle_scale(void *data, struct wl_output *wl_output, int32_t factor);
+
+    static void
+    shell_surface_ping (void *data, struct wl_shell_surface *shell_surface, uint32_t serial);
+
+    static void
+    shell_surface_configure (void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height);
+
+    static void
+    shell_surface_popup_done (void *data, struct wl_shell_surface *shell_surface);
 
     static void
     xdg_wm_base_handle_ping(void *data, struct xdg_wm_base *xdg_wm_base,
@@ -155,6 +165,7 @@ private:
         wl_seat *seat;
         wl_pointer *pointer;
         wl_keyboard *keyboard;
+        struct wl_shell *shell;
         struct xdg_wm_base *xdg_wm_base;
         OutputsVector outputs;
     } *display_;
@@ -163,6 +174,7 @@ private:
         WindowProperties properties;
         bool waiting_for_configure;
         struct wl_surface *surface;
+        struct wl_shell_surface *shell_surface;
         struct wl_egl_window *native;
         struct xdg_surface *xdg_surface;
         struct xdg_toplevel *xdg_toplevel;

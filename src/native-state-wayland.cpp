@@ -42,6 +42,12 @@ const struct xdg_surface_listener NativeStateWayland::xdg_surface_listener_ = {
     NativeStateWayland::xdg_surface_handle_configure
 };
 
+const struct wl_shell_surface_listener NativeStateWayland::shell_surface_listener_ = {
+	NativeStateWayland::shell_surface_ping,
+	NativeStateWayland::shell_surface_configure,
+	NativeStateWayland::shell_surface_popup_done
+};
+
 const struct xdg_wm_base_listener NativeStateWayland::xdg_wm_base_listener_ = {
     NativeStateWayland::xdg_wm_base_handle_ping
 };
@@ -153,6 +159,9 @@ NativeStateWayland::registry_handle_global(void *data, struct wl_registry *regis
 
         wl_output_add_listener(my_output->output, &output_listener_, my_output);
         wl_display_roundtrip(that->display_->display);
+    } else if (strcmp(interface, "wl_shell") == 0) {
+		that->display_->shell = (struct wl_shell*)wl_registry_bind(registry, id,
+		    &wl_shell_interface, 1);
     } else if (strcmp(interface, "wl_seat") == 0) {
         that->display_->seat =
             static_cast<struct wl_seat *>(
@@ -214,6 +223,73 @@ NativeStateWayland::xdg_wm_base_handle_ping(void * /*data*/, struct xdg_wm_base 
                                             uint32_t serial)
 {
     xdg_wm_base_pong(xdg_wm_base, serial);
+}
+
+
+void
+NativeStateWayland::shell_surface_ping (void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
+{
+	wl_shell_surface_pong (shell_surface, serial);
+}
+
+void
+NativeStateWayland::shell_surface_configure (void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
+{
+    NativeStateWayland *that = static_cast<NativeStateWayland *>(data);
+
+	// uint32_t *state;
+    // bool want_fullscreen = true;
+    // bool want_maximized = false;
+    // uint32_t scale = 1;
+
+    // that->window_->waiting_for_configure = false;
+
+    // if (!that->display_->outputs.empty()) scale = that->display_->outputs.at(0)->scale;
+
+    // /* If the user requested a particular mode try to honor the request. The only
+    //  * exception is if the compositor has maximized the surface, in which case
+    //  * we need to provide a surface with the particular size the compositor
+    //  * asked for. */
+    // if (want_maximized) {
+    //     that->window_->properties.width = width * scale;
+    //     that->window_->properties.height = height * scale;
+    // } else if (that->window_->properties.fullscreen) {
+    //     if (want_fullscreen) {
+    //         that->window_->properties.width = width * scale;
+    //         that->window_->properties.height = height * scale;
+    //     } else if (!that->display_->outputs.empty()) {
+    //         that->window_->properties.width =
+    //             that->display_->outputs.at(0)->width;
+    //         that->window_->properties.height =
+    //             that->display_->outputs.at(0)->height;
+    //     }
+    // }
+
+    // width = that->window_->properties.width;
+    // height = that->window_->properties.height;
+
+    if (!that->window_->native) {
+        that->window_->native =
+            wl_egl_window_create(that->window_->surface, width, height);
+    } else {
+        wl_egl_window_resize(that->window_->native, width, height, 0, 0);
+    }
+
+    // struct wl_region *opaque_reqion = wl_compositor_create_region(that->display_->compositor);
+    // wl_region_add(opaque_reqion, 0, 0, width, height);
+    // wl_surface_set_opaque_region(that->window_->surface, opaque_reqion);
+    // wl_region_destroy(opaque_reqion);
+
+    // if (wl_surface_get_version(that->window_->surface) >=
+    //         WL_SURFACE_SET_BUFFER_SCALE_SINCE_VERSION) {
+    //     wl_surface_set_buffer_scale(that->window_->surface, scale);
+    // }
+}
+
+void
+NativeStateWayland::shell_surface_popup_done (void *data, struct wl_shell_surface *shell_surface)
+{
+	int i = 0;
 }
 
 void
@@ -348,21 +424,74 @@ NativeStateWayland::create_window(WindowProperties const& properties)
     window_->surface = wl_compositor_create_surface(display_->compositor);
     window_->xdg_surface = xdg_wm_base_get_xdg_surface(display_->xdg_wm_base,
                                                        window_->surface);
-    xdg_surface_add_listener(window_->xdg_surface, &xdg_surface_listener_, this);
-    window_->xdg_toplevel = xdg_surface_get_toplevel(window_->xdg_surface);
-    xdg_toplevel_add_listener(window_->xdg_toplevel, &xdg_toplevel_listener_, this);
+    if(window_->xdg_surface)
+    {   
+        xdg_surface_add_listener(window_->xdg_surface, &xdg_surface_listener_, this);
+        window_->xdg_toplevel = xdg_surface_get_toplevel(window_->xdg_surface);
+        xdg_toplevel_add_listener(window_->xdg_toplevel, &xdg_toplevel_listener_, this);
 
-    xdg_toplevel_set_app_id(window_->xdg_toplevel, "com.github.glmark2.glmark2");
-    xdg_toplevel_set_title(window_->xdg_toplevel, "glmark2");
-    if (window_->properties.fullscreen && output)
-        xdg_toplevel_set_fullscreen(window_->xdg_toplevel, output->output);
+        xdg_toplevel_set_app_id(window_->xdg_toplevel, "com.github.glmark2.glmark2");
+        xdg_toplevel_set_title(window_->xdg_toplevel, "glmark2");
+        if (window_->properties.fullscreen && output)
+            xdg_toplevel_set_fullscreen(window_->xdg_toplevel, output->output);
+    }
+    else {
+        window_->shell_surface = wl_shell_get_shell_surface(display_->shell, window_->surface);
+		if (window_->shell_surface == NULL) {
+			fprintf(stderr, "Can't create shell surface");
+			return false;
+		} else {
+			fprintf(stderr, "[Good] Created shell surface");
+		}
+
+        int width = output->width;
+        int height = output->height;
+
+        window_->properties.fullscreen = true;
+        bool want_maximized = false;
+        uint32_t scale = 0.7;
+
+        window_->waiting_for_configure = false;
+
+        if (!display_->outputs.empty()) scale = display_->outputs.at(0)->scale;
+
+        /* If the user requested a particular mode try to honor the request. The only
+        * exception is if the compositor has maximized the surface, in which case
+        * we need to provide a surface with the particular size the compositor
+        * asked for. */
+        
+        window_->properties.width = width * scale;
+        window_->properties.height = height * scale;
+
+        if (!window_->native) {
+            window_->native =
+                wl_egl_window_create(window_->surface, width, height);
+        } else {
+            wl_egl_window_resize(window_->native, width, height, 0, 0);
+        }
+
+        struct wl_region *opaque_reqion = wl_compositor_create_region(display_->compositor);
+        wl_region_add(opaque_reqion, 0, 0, width, height);
+        wl_surface_set_opaque_region(window_->surface, opaque_reqion);
+        wl_region_destroy(opaque_reqion);
+
+        if (wl_surface_get_version(window_->surface) >=
+                WL_SURFACE_SET_BUFFER_SCALE_SINCE_VERSION) {
+            wl_surface_set_buffer_scale(window_->surface, scale);
+        }
+
+		wl_shell_surface_add_listener(window_->shell_surface, &shell_surface_listener_, this);
+    }
     wl_surface_commit(window_->surface);
     window_->waiting_for_configure = true;
 
     /* xdg-shell requires us to wait for the compositor to tell us what its
      * desired size for us is */
-    while (window_->waiting_for_configure)
-        wl_display_roundtrip(display_->display);
+    if(window_->xdg_surface) {
+        while (window_->waiting_for_configure)
+            wl_display_roundtrip(display_->display);
+    }
+    
 
     return true;
 }
