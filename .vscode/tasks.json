@@ -24,7 +24,9 @@
                 "-R","zypper","in","-y",
                 "libjpeg-turbo-devel",
                 "wayland-devel",
-                "wayland-egl-devel"
+                "wayland-egl-devel",
+                "wayland-protocols-devel",
+                "systemd-devel"
             ],
             "problemMatcher": [],
             "group": {
@@ -33,7 +35,7 @@
             }
         },
         {
-            "label": "Configure Aurora/Sailfish armv7",
+            "label": "Configure Aurora/Sailfish Debug armv7",
             "type": "shell",
             "command": "${engine}",
             "args": [
@@ -45,6 +47,27 @@
                 "--with-flavors=wayland-glesv2",
                 "--data-path=${datapath}",
                 "--prefix=/usr"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Configure Aurora/Sailfish Release armv7",
+            "type": "shell",
+            "command": "${engine}",
+            "args": [
+                "sb2",
+                "-t",
+                "${target}",
+                "./waf",
+                "configure",
+                "--with-flavors=wayland-glesv2",
+                "--data-path=${datapath}",
+                "--prefix=/usr",
+                "--no-debug"
             ],
             "problemMatcher": [],
             "group": {

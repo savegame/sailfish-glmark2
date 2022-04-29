@@ -94,6 +94,8 @@ NativeStateWayland::~NativeStateWayland()
             xdg_surface_destroy(window_->xdg_surface);
         if (window_->native)
             wl_egl_window_destroy(window_->native);
+        if (window_->shell_surface)
+            wl_shell_surface_destroy(window_->shell_surface);
         if (window_->surface)
             wl_surface_destroy(window_->surface);
         delete window_;
@@ -420,12 +422,13 @@ NativeStateWayland::create_window(WindowProperties const& properties)
     if (!display_->outputs.empty()) output = display_->outputs.at(0);
     window_ = new struct my_window();
     window_->properties = properties;
-
+    window_->xdg_surface = NULL;
     window_->surface = wl_compositor_create_surface(display_->compositor);
-    window_->xdg_surface = xdg_wm_base_get_xdg_surface(display_->xdg_wm_base,
-                                                       window_->surface);
-    if(window_->xdg_surface)
+    
+    if(display_->xdg_wm_base)
     {   
+        window_->xdg_surface = xdg_wm_base_get_xdg_surface(display_->xdg_wm_base,
+                                                       window_->surface);
         xdg_surface_add_listener(window_->xdg_surface, &xdg_surface_listener_, this);
         window_->xdg_toplevel = xdg_surface_get_toplevel(window_->xdg_surface);
         xdg_toplevel_add_listener(window_->xdg_toplevel, &xdg_toplevel_listener_, this);
@@ -440,8 +443,6 @@ NativeStateWayland::create_window(WindowProperties const& properties)
 		if (window_->shell_surface == NULL) {
 			fprintf(stderr, "Can't create shell surface");
 			return false;
-		} else {
-			fprintf(stderr, "[Good] Created shell surface");
 		}
 
         int width = output->width;
@@ -449,16 +450,11 @@ NativeStateWayland::create_window(WindowProperties const& properties)
 
         window_->properties.fullscreen = true;
         bool want_maximized = false;
-        uint32_t scale = 0.7;
+        uint32_t scale = 1;
 
         window_->waiting_for_configure = false;
 
         if (!display_->outputs.empty()) scale = display_->outputs.at(0)->scale;
-
-        /* If the user requested a particular mode try to honor the request. The only
-        * exception is if the compositor has maximized the surface, in which case
-        * we need to provide a surface with the particular size the compositor
-        * asked for. */
         
         window_->properties.width = width * scale;
         window_->properties.height = height * scale;
@@ -481,13 +477,15 @@ NativeStateWayland::create_window(WindowProperties const& properties)
         }
 
 		wl_shell_surface_add_listener(window_->shell_surface, &shell_surface_listener_, this);
+
+        wl_shell_surface_set_title(window_->shell_surface, "harbour-glmark2");
     }
     wl_surface_commit(window_->surface);
-    window_->waiting_for_configure = true;
 
-    /* xdg-shell requires us to wait for the compositor to tell us what its
-     * desired size for us is */
     if(window_->xdg_surface) {
+        /* xdg-shell requires us to wait for the compositor to tell us what its
+        * desired size for us is */
+        window_->waiting_for_configure = true;
         while (window_->waiting_for_configure)
             wl_display_roundtrip(display_->display);
     }
