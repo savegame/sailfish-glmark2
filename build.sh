@@ -2,7 +2,7 @@
 _pwd=`dirname $(readlink -e "$0")`
 pushd ${_pwd} &> /dev/null
 
-dependencies="libjpeg-turbo-devel wayland-devel wayland-egl-devel wayland-protocols-devel systemd-devel libGLESv2-devel"
+dependencies="wayland-devel wayland-egl-devel wayland-protocols-devel systemd-devel libGLESv2-devel"
 engine_exec="docker exec --user mersdk -w `pwd` aurora-os-build-engine"
 build_dir="build_rpm"
 

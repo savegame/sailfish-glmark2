@@ -161,7 +161,15 @@ def configure_win32(ctx):
 def configure_linux(ctx):
     # Check required headers
     req_headers = ['stdlib.h', 'string.h', 'stdint.h', 'stdio.h', 'dlfcn.h',
-                   'unistd.h', 'jpeglib.h', 'math.h', 'string.h']
+                   'unistd.h',  'math.h', 'string.h']
+                #    'unistd.h', 'jpeglib.h', 'math.h', 'string.h']
+
+    if list_contains(ctx.options.flavors, 'wayland'):
+        turbojpeg_path = Context.g_module.root_path.replace('wscript','sailfish/libjpeg-turbo-2.1.3/')
+        print("Context.g_module.root_path = " + turbojpeg_path)
+        ctx.env.append_value('INCLUDES', [turbojpeg_path, os.path.join(turbojpeg_path,"build")])
+        ctx.env.append_value('LDFLAGS', '-L' + Context.g_module.root_path.replace('wscript','sailfish/libjpeg-turbo-2.1.3/build') )
+
     for header in req_headers:
         ctx.check_cc(header_name = header, auto_add_header_name = True, mandatory = True)
 
@@ -230,6 +238,8 @@ def configure_linux(ctx):
                       variables = ['pkgdatadir'], uselib_store = 'WAYLAND_PROTOCOLS')
         ctx.check_cfg(package = 'wayland-scanner', variables = ['wayland_scanner'],
                       uselib_store = 'WAYLAND_SCANNER')
+        # ctx.env.append_value('CXXFLAGS', '-I' + os.path.join(Context.g_module.root_path,'sailfish/libjpeg-turbo-2.1.3/') )
+        # ctx.env.append_value('LDFLAGS', '-L' + os.path.join(Context.g_module.root_path,'sailfish/libjpeg-turbo-2.1.3/build') )
 
     # Prepend CXX flags so that they can be overriden by the
     # CXXFLAGS environment variable

@@ -8,7 +8,6 @@ BuildArch:  %{_arch}
 URL:        https://github.com/savegame/sailfish-glmark2
 Source0:    %{name}.tar.gz
 
-BuildRequires: libjpeg-turbo-devel
 BuildRequires: wayland-devel
 BuildRequires: wayland-egl-devel
 BuildRequires: wayland-protocols-devel
@@ -29,14 +28,20 @@ echo "Unpack sources"
 # mkdir -p %{_topdir}/BUILD
 cd %{_topdir}/BUILD
 tar -xzf %{_topdir}/SOURCES/%{name}.tar.gz
+# build libjpeg
+cd sailfish/libjpeg-turbo-2.1.3
+cmake -Bbuild -DENABLE_STATIC=TRUE -DENABLE_SHARED=FALSE -DWITH_TURBOJPEG=FALSE .
+
+%build
+cd %{_topdir}/BUILD/sailfish/libjpeg-turbo-2.1.3/build
+make -j12
+cd %{_topdir}/BUILD/
 ./waf configure \
     --with-flavors=wayland-glesv2 \
     --data-path=%{_datadir}/%{name}/data \
     --prefix=/usr \
     --no-debug
 
-%build
-cd %{_topdir}/BUILD/
 ./waf build -j`nproc`
 # strip build/src/glmark2-es2-wayland
 
