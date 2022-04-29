@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="172"
+   height="172"
+   viewBox="0 0 45.508332 45.508335"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2" />
+  <g
+     id="layer1">
+    <rect
+       style="fill:#008476;fill-opacity:1;stroke:none;stroke-width:0.955323;stroke-linecap:round;stroke-linejoin:round"
+       id="rect1006"
+       width="45.423527"
+       height="45.598232"
+       x="0.087352939"
+       y="0.087352939"
+       ry="3.6445827" />
+    <ellipse
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.949561;stroke-linecap:round;stroke-linejoin:round"
+       id="path3491"
+       cx="23.104855"
+       cy="23.104853"
+       rx="18.867189"
+       ry="18.475147" />
+    <ellipse
+       style="fill:#008476;fill-opacity:1;stroke:none;stroke-width:0.782499;stroke-linecap:round;stroke-linejoin:round"
+       id="path3491-6"
+       cx="23.104855"
+       cy="23.104853"
+       rx="15.547777"
+       ry="15.22471" />
+    <rect
+       style="fill:#008476;fill-opacity:1;stroke:none;stroke-width:0.955323;stroke-linecap:round;stroke-linejoin:round"
+       id="rect6119"
+       width="39.308823"
+       height="10.395004"
+       x="3.319412"
+       y="33.980293"
+       ry="3.6445825" />
+    <path
+       id="path6154"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.292278px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 33.951278,17.000209 c 0,0 -10.688529,2.462187 -11.710617,3.082727 -1.022089,0.62054 -1.154816,2.07051 -0.663907,2.951326 0.440287,0.78999 1.883809,1.145354 2.564286,0.886542 0.64057,-0.243638 9.810238,-6.920595 9.810238,-6.920595 z M 23.545636,21.28516 c 0.348469,1.88e-4 0.630842,0.267483 0.630799,0.597116 4.2e-5,0.329632 -0.282331,0.596925 -0.630799,0.597113 -0.348689,1.07e-4 -0.631406,-0.267272 -0.631364,-0.597113 -4.3e-5,-0.329842 0.282674,-0.597223 0.631364,-0.597116 z" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="13.714412"
+       y="42.016766"
+       id="text14732"><tspan
+         id="tspan14730"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
+         x="13.714412"
+         y="42.016766">FPS</tspan></text>
+  </g>
+</svg>
