@@ -67,5 +67,8 @@ rsync -avP %{_topdir}/BUILD/sailfish/icon_172.png %{buildroot}/usr/share/icons/h
 %{_datadir}/applications/%{name}.desktop
 
 %changelog 
+* Sat Apr 30 2022 sashikknox <sashikknox@gmail.com>
+- default launcher run fullscreen render resolution
+- default resolution is 800x600
 * Fri Apr 29 2022 sashikknox <sashikknox@gmail.com>
 - fixes for SailfishOS wayland

@@ -210,6 +210,7 @@ NativeStateWayland::output_handle_mode(void *data, struct wl_output * /*wl_outpu
 void
 NativeStateWayland::output_handle_done(void * /*data*/, struct wl_output * /*wl_output*/)
 {
+    fprintf(stderr, "output_handle_done");
 }
 
 void
@@ -459,6 +460,13 @@ NativeStateWayland::create_window(WindowProperties const& properties)
             window_->properties.width = output->width; 
             window_->properties.height = output->height; 
         }
+        // else { 
+        //     if (output->width < window_->properties.width) 
+        //         window_->properties.width = output->width;
+
+        //     if (output->height < window_->properties.height) 
+        //         window_->properties.height = output->height;
+        // }
         width = window_->properties.width;
         height = window_->properties.height;
 
