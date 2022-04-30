@@ -1,7 +1,7 @@
 Name:       harbour-glmark2
 Summary:    GLMark 2 
 Release:    1
-Version:    1.0.0
+Version:    1.0.1
 Group:      Amusements/Games
 License:    GPLv3
 BuildArch:  %{_arch}
@@ -30,7 +30,7 @@ cd %{_topdir}/BUILD
 tar -xzf %{_topdir}/SOURCES/%{name}.tar.gz
 # build libjpeg
 cd sailfish/libjpeg-turbo-2.1.3
-cmake -Bbuild -DENABLE_STATIC=TRUE -DENABLE_SHARED=FALSE -DWITH_TURBOJPEG=FALSE .
+cmake -Bbuild -DENABLE_STATIC=TRUE -DENABLE_SHARED=FALSE -DWITH_TURBOJPEG=FALSE -DWITH_SIMD=FALSE .
 
 %build
 cd %{_topdir}/BUILD/sailfish/libjpeg-turbo-2.1.3/build

@@ -445,19 +445,22 @@ NativeStateWayland::create_window(WindowProperties const& properties)
 			return false;
 		}
 
-        int width = output->width;
-        int height = output->height;
+        int width = window_->properties.width; 
+        int height = window_->properties.height; 
 
-        window_->properties.fullscreen = true;
         bool want_maximized = false;
-        uint32_t scale = 1;
+        uint32_t scale = 2;
 
         window_->waiting_for_configure = false;
 
         if (!display_->outputs.empty()) scale = display_->outputs.at(0)->scale;
         
-        window_->properties.width = width * scale;
-        window_->properties.height = height * scale;
+        if( window_->properties.fullscreen ) {
+            window_->properties.width = output->width; 
+            window_->properties.height = output->height; 
+        }
+        width = window_->properties.width;
+        height = window_->properties.height;
 
         if (!window_->native) {
             window_->native =

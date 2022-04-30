@@ -2,8 +2,17 @@
 _pwd=`dirname $(readlink -e "$0")`
 pushd ${_pwd} &> /dev/null
 
-dependencies="wayland-devel wayland-egl-devel wayland-protocols-devel systemd-devel libGLESv2-devel"
-engine_exec="docker exec --user mersdk -w `pwd` aurora-os-build-engine"
+dependencies="wayland-devel wayland-egl-devel wayland-protocols-devel systemd-devel libGLESv2-devel rsync"
+engine_exec="sfdk engine exec" # SailfishOS with sdfk tool
+
+if [ "$1" == "aurora" ]; then 
+    echo "Build for AuroraOS"
+    engine_exec="docker exec --user mersdk -w `pwd` aurora-os-build-engine" # AuroraOS docker
+else 
+    echo "Build for SailfishOS"
+    engine_exec="docker exec --user mersdk -w `pwd` sailfish-sdk-build-engine_`whoami`" # SailfishOS 4.4 docker 
+    # engine_exec="sfdk engine exec" # SailfishOS with sdfk tool
+fi
 build_dir="build_rpm"
 
 if [[ "${engine_exec}" == *"aurora"* ]]; then
@@ -36,7 +45,9 @@ if [[ "${engine_exec}" == *"aurora"* ]]; then
     done
 fi
 
+# echo "Targets: "
 sfdk_targets=`${engine_exec} sb2-config -l|grep -v default|grep armv7`
+# echo "$sfdk_targets"
 
 for each in ${sfdk_targets}; do
     target_arch=${each##*-}

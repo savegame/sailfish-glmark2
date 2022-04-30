@@ -2,7 +2,7 @@
 Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=harbour-glmark2
-Exec=harbour-glmark2
+Exec=harbour-glmark2 --fullscreen
 Name=GLMark2 Benchmark
 Name[en]=GLMark2 Benchmark
 
