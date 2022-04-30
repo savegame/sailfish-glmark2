@@ -2,6 +2,7 @@
 _pwd=`dirname $(readlink -e "$0")`
 pushd ${_pwd} &> /dev/null
 
+version=`grep Version sailfish/sailfish.spec|sed "s/Version:\s\+//g"`
 dependencies="wayland-devel wayland-egl-devel wayland-protocols-devel systemd-devel libGLESv2-devel rsync"
 engine_exec="sfdk engine exec" # SailfishOS with sdfk tool
 
@@ -10,8 +11,9 @@ if [ "$1" == "aurora" ]; then
     engine_exec="docker exec --user mersdk -w `pwd` aurora-os-build-engine" # AuroraOS docker
 else 
     echo "Build for SailfishOS"
-    engine_exec="docker exec --user mersdk -w `pwd` sailfish-sdk-build-engine_`whoami`" # SailfishOS 4.4 docker 
-    # engine_exec="sfdk engine exec" # SailfishOS with sdfk tool
+    # engine_exec="docker exec --user mersdk -w `pwd` sailfish-sdk-build-engine_`whoami`" # SailfishOS 4.4 docker 
+    export PATH=$HOME/SailfishOS/bin:${PATH} #default SailfishOS SDK installation path
+    engine_exec="sfdk engine exec" # SailfishOS with sdfk tool
 fi
 build_dir="build_rpm"
 
@@ -73,27 +75,28 @@ for each in ${sfdk_targets}; do
     # sign RPM packacge 
     if [[ "${engine_exec}" == *"aurora"* ]]; then
         echo -n "Signing RPMs: "
-        ${target} rpmsign-external sign --key `pwd`/regular_key.pem --cert `pwd`/regular_cert.pem ${build_root}/RPMS/${target_arch}/harbour-glmark2-1.*
+        ${target} rpmsign-external sign --key `pwd`/regular_key.pem --cert `pwd`/regular_cert.pem ${build_root}/RPMS/${target_arch}/harbour-glmark2-${version}*
         if [ $? -ne 0 ] ; then 
             echo "FAIL"
             break; 
         fi
         echo "OK"
         echo -n "Validate RPMs: "
-        validator_output=`${target} rpm-validator -p regular ${build_root}/RPMS/${target_arch}/harbour-glmark2-1.* 2>&1`
+        validator_output=`${target} rpm-validator -p regular ${build_root}/RPMS/${target_arch}/harbour-glmark2-${version}* 2>&1`
         if [ $? -ne 0 ] ; then 
             echo "FAIL"
             echo "${validator_output}"
-            break; 
+            break
         fi
         echo "OK"
-    elif [[ "${engine_exec}" == "sfdk "* ]] ;then
+    elif [[ "${engine_exec}" == "sfdk "* || "${engine_exec}" == *"sailfish"* ]] ;then
         echo -n "Validate RPM: "
         sfdk config target=${each}
-        sfdk check ${build_root}/RPMS/${target_arch}/harbour-glmark2-1.*
+        validator_output=`sfdk check ${build_root}/RPMS/${target_arch}/harbour-glmark2-${version}* 2>&1`
         if [ $? -ne 0 ] ; then 
             echo "FAIL"
-            break;
+            echo "${validator_output}"
+            break
         fi
         echo "OK"
     fi
